@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coinfall</title>
+<meta name="description" content="A free-to-play casino with live multiplayer tables and coins that drop every hour. No real money.">
+<meta name="theme-color" content="#0b1418">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23f5b83f' stroke='%23a8721a' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23ffd98a' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#lobby" aria-label="Coinfall lobby"><span class="coin lg"></span><span class="logo-word">Coinfall</span></a>
+  <div class="top-mid">
+    <div class="drop" title="20 free coins every hour you're online">
+      <div class="drop-txt"><span>Next 20 coins</span><b class="num" data-drop>--:--</b></div>
+      <div class="drop-bar"><i id="drop-bar"></i></div>
+    </div>
+    <span class="pill online" id="online" title="People online"><i class="dot"></i><span id="online-n">0</span> online</span>
+  </div>
+  <a class="lvl-chip" id="lvl-chip" href="#rewards" title="Your level" hidden><span class="lvl-ring" id="lvl-ring"><b id="lvl-n">1</b></span><span class="lvl-txt"><span>Level</span><b class="num" id="lvl-pct">0%</b></span></a>
+  <div class="wallet" id="wallet" aria-label="Your coins" hidden><span class="coin"></span><span class="num" data-bal>0.00</span></div>
+  <button class="icon-btn chat-btn" id="chat-btn" type="button" aria-label="Open chat" title="Chat"></button>
+  <button class="icon-btn" id="sound-btn" type="button" aria-label="Sound on" title="Sound"></button>
+  <div class="auth-btns" id="auth-btns"><button class="btn-ghost sm" type="button" data-act="login">Log in</button><button class="btn-go sm" type="button" data-act="signup">Sign up</button></div>
+  <div class="me-wrap" id="me-wrap" hidden>
+    <button class="me-chip" id="me-chip" type="button" aria-haspopup="true" aria-expanded="false"><span class="ava" id="me-ava">?</span><span id="me-name"></span></button>
+    <div class="menu" id="me-menu" hidden>
+      <a href="#rewards">Rewards</a>
+      <a href="#admin" id="admin-link" hidden>Admin</a>
+      <button type="button" data-act="logout">Log out</button>
+    </div>
+  </div>
+</header>
+<div class="conn" id="conn" hidden>Connecting to the casino…</div>
+
+<div class="shell">
+  <nav class="side" id="side" aria-label="Sections"></nav>
+
+  <main class="main" id="main">
+
+    <!-- LOBBY -->
+    <section class="view" data-view="lobby">
+      <p class="local-note" id="local-note" hidden>You're playing the Claude version of Coinfall. Your coins and the leaderboard are saved, and the live tables are filled with bot players so they always have action. Real multiplayer with friends needs the website version.</p>
+      <div class="hero">
+        <div class="hero-coins" aria-hidden="true">
+          <span class="coin" style="--s:44px;right:12%;top:14%;transform:rotate(-20deg) scaleX(.55)"></span>
+          <span class="coin" style="--s:26px;right:34%;top:8%;transform:scaleX(.8)"></span>
+          <span class="coin" style="--s:34px;right:26%;top:52%;transform:rotate(30deg) scaleX(.35)"></span>
+          <span class="coin" style="--s:20px;right:6%;top:62%"></span>
+          <span class="coin" style="--s:16px;right:46%;top:36%;transform:scaleX(.6)"></span>
+        </div>
+        <div>
+          <p class="eyebrow">Free-play casino</p>
+          <h1>Free coins drop every hour.</h1>
+          <p class="hero-sub">Stay online and 20 coins land in your wallet each hour, plus free cases to open. Bet at live tables, fight in case battles, level up for bigger rakeback, and climb the leaderboard. Nothing here costs or pays real money.</p>
+          <div class="hero-cta" id="hero-cta"><button class="btn-go sm" type="button" data-act="signup">Sign up free</button><a class="btn-ghost" href="#roulette">Watch live roulette</a></div>
+        </div>
+        <div class="hero-stat">
+          <span class="lbl">Your wallet</span>
+          <span class="hero-bal num" data-bal>—</span>
+          <span class="hero-drop">Next 20 coins in <b class="num" data-drop>--:--</b></span>
+        </div>
+      </div>
+      <div class="sec-head"><h2 class="sec-h">Live tables</h2><span class="pill live"><i class="dot"></i>Play with everyone online</span></div>
+      <div class="games" id="grid-live"></div>
+      <h2 class="sec-h">Cases</h2>
+      <div class="games" id="grid-cases"></div>
+      <h2 class="sec-h">Solo games</h2>
+      <div class="games" id="grid-solo"></div>
+      <div class="two">
+        <div class="card">
+          <div class="card-head"><h3 class="card-h">Top winners</h3><a class="link" href="#leaderboard">Full leaderboard</a></div>
+          <ol class="rowlist" id="lobby-lb"><li class="empty">Loading…</li></ol>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3 class="card-h">How you get coins</h3></div>
+          <ul class="howto">
+            <li><b>100</b><span>when you sign up</span></li>
+            <li><b>+20</b><span>every hour you're online. If you're away, the next drop waits for you</span></li>
+            <li><b>+100</b><span>daily bonus, once every 24 hours on Rewards</span></li>
+            <li><b>Cases</b><span>free cases every hour, and bigger ones unlock as you level up</span></li>
+            <li><b>Rakeback</b><span>a slice of every bet comes back, and it grows each level</span></li>
+            <li><b>Rain</b><span>every 30 minutes a pot is split between everyone who joined</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- REWARDS -->
+    <section class="view" data-view="rewards" hidden>
+      <h1 class="page-h">Rewards</h1>
+      <div class="rewards">
+        <div class="card reward level-card">
+          <div class="card-head"><h3 class="card-h">Your level</h3><span class="pill" id="lv-rake-pill">0.25% rakeback</span></div>
+          <div class="lv-big"><span class="lv-num" id="lv-num">1</span><div class="lv-meta"><b id="lv-next">Sign up to start leveling</b><div class="lv-track"><i id="lv-fill"></i></div><span id="lv-sub">XP is the coins you wager on any game. Leveling is very hard on purpose.</span></div></div>
+        </div>
+        <div class="card reward">
+          <div class="card-head"><h3 class="card-h">Rakeback</h3><span class="reward-amt"><span class="coin sm"></span><span class="num" id="rake-amt">0.00</span></span></div>
+          <p id="rake-sub">You get 0.25% of every bet back, and it goes up 0.05% every level.</p>
+          <button class="btn-go" type="button" id="rake-btn" data-act="rake" disabled>Claim rakeback</button>
+        </div>
+        <div class="card reward">
+          <div class="card-head"><h3 class="card-h">Free cases</h3><span class="pill" id="free-ready-pill">0 ready</span></div>
+          <p>Open each unlocked free case once an hour. Higher levels unlock bigger cases.</p>
+          <a class="btn-go" href="#free">Open free cases</a>
+        </div>
+        <div class="card reward">
+          <div class="card-head"><h3 class="card-h">Hourly drop</h3><span class="reward-amt"><span class="coin sm"></span>20</span></div>
+          <div class="ring-wrap">
+            <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fg" id="hourly-ring" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="326.73"/></svg>
+            <div class="ring-txt"><b class="num" data-drop>--:--</b><span>until drop</span></div>
+          </div>
+          <p>Stay online and 20 coins land in your wallet every hour, no clicking needed. If you leave, your next drop waits for you to come back.</p>
+        </div>
+        <div class="card reward">
+          <div class="card-head"><h3 class="card-h">Daily bonus</h3><span class="reward-amt"><span class="coin sm"></span>100</span></div>
+          <p>Claim 100 coins once every 24 hours.</p>
+          <button class="btn-go" type="button" id="daily-btn" data-act="daily" disabled>Claim 100 coins</button>
+        </div>
+        <div class="card rain-card" data-rain></div>
+        <div class="card">
+          <div class="card-head"><h3 class="card-h">Your stats</h3></div>
+          <div class="stat-grid">
+            <div class="stat"><span>Balance</span><b data-stat="balance">—</b></div>
+            <div class="stat"><span>Net winnings</span><b data-stat="profit">—</b></div>
+            <div class="stat"><span>Total wagered</span><b data-stat="wagered">—</b></div>
+            <div class="stat"><span>Total paid out</span><b data-stat="won">—</b></div>
+            <div class="stat"><span>Bets</span><b data-stat="bets">—</b></div>
+            <div class="stat"><span>Biggest hit</span><b data-stat="best">—</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3 class="card-h">Level road</h3><span class="hint">XP = coins wagered</span></div>
+        <div class="lb-wrap"><table class="lb road"><thead><tr><th>Level</th><th>Total wagered</th><th>Rakeback</th><th>Unlocks</th></tr></thead><tbody id="road-body"></tbody></table></div>
+      </div>
+      <p class="lead">Rain drops every 30 minutes. The pot starts at 25 coins, and 1% of every bet, the house cut from coinflips and jackpots, and any tips go into it. When it drops, it's split evenly between everyone who pressed Join. If nobody joins, it rolls over.</p>
+    </section>
+
+    <!-- LEADERBOARD -->
+    <section class="view" data-view="leaderboard" hidden>
+      <h1 class="page-h">Leaderboard</h1>
+      <div class="tabs" role="tablist" id="lb-tabs"></div>
+      <div class="card lb-wrap">
+        <table class="lb">
+          <thead><tr><th>#</th><th>Player</th><th id="lb-head">Net winnings</th></tr></thead>
+          <tbody id="lb-body"><tr><td colspan="3" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="view" data-view="admin" hidden>
+      <h1 class="page-h">Admin</h1>
+      <p class="lead">You're the admin because you made the first account on this site. Find a player to give coins, rename them, or ban them.</p>
+      <div class="card">
+        <form class="admin-search" id="admin-form"><input class="txt" id="admin-q" placeholder="Search player names" autocomplete="off"><button class="btn-go sm" type="submit">Search</button></form>
+        <div class="lb-wrap"><table class="lb admin-tbl"><thead><tr><th>Player</th><th>Balance</th><th>Actions</th></tr></thead><tbody id="admin-body"><tr><td colspan="3" class="empty">Search to see players.</td></tr></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- CASES -->
+    <section class="view" data-view="cases" hidden>
+      <div class="game-top"><h1 class="page-h">Cases</h1><span class="pill">120 cases · ~95% RTP</span><a class="pill link-pill" href="#free">Free cases</a><a class="pill link-pill" href="#battles">Case battles</a></div>
+      <div class="case-tools">
+        <input class="txt" id="case-q" placeholder="Search cases" autocomplete="off" aria-label="Search cases">
+        <div class="seg" id="case-range"><button type="button" data-r="all" aria-pressed="true">All</button><button type="button" data-r="hr" class="seg-hr">High roller</button><button type="button" data-r="0-1">≤1</button><button type="button" data-r="1-10">1–10</button><button type="button" data-r="10-100">10–100</button><button type="button" data-r="100-1000">100–1K</button><button type="button" data-r="1000-25000">1K–25K</button></div>
+        <select class="sel" id="case-sort" aria-label="Sort cases"><option value="asc">Cheapest first</option><option value="desc">Priciest first</option><option value="name">A to Z</option></select>
+      </div>
+      <div class="case-grid" id="case-grid"></div>
+    </section>
+
+    <section class="view" data-view="case" hidden>
+      <a class="link back" href="#cases">← All cases</a>
+      <div class="case-head" id="case-head"></div>
+      <div class="reel-box"><div class="reel-h" id="case-reel"></div></div>
+      <div class="case-actions"><button class="btn-go" type="button" id="case-open">Open</button><label class="switch"><input type="checkbox" id="case-fast"><span>Fast open</span></label><span class="case-result" id="case-result"></span></div>
+      <h2 class="sec-h">What's inside</h2>
+      <div class="item-grid" id="case-items"></div>
+    </section>
+
+    <section class="view" data-view="free" hidden>
+      <div class="game-top"><h1 class="page-h">Free cases</h1><span class="pill">One of each every hour</span></div>
+      <p class="lead">Every case you've unlocked opens for free once an hour. Level up to unlock bigger ones. The number on each case is what it pays on average.</p>
+      <div class="reel-box" id="free-reel-box" hidden><div class="reel-h" id="free-reel"></div><div class="case-result center" id="free-result"></div></div>
+      <div class="free-grid" id="free-grid"></div>
+    </section>
+
+    <section class="view" data-view="battles" hidden>
+      <div class="game-top"><h1 class="page-h">Case battles</h1><span class="pill live"><i class="dot"></i>Live</span><span class="pill">Winner takes every drop</span></div>
+      <div class="card bm">
+        <div class="bm-row">
+          <div class="fld"><span class="lbl">Mode</span><div class="seg" id="bm-mode"><button type="button" data-mode="1v1" aria-pressed="true">1v1</button><button type="button" data-mode="1v1v1">1v1v1</button><button type="button" data-mode="1v1v1v1">1v1v1v1</button><button type="button" data-mode="2v2">2v2</button></div></div>
+          <label class="switch"><input type="checkbox" id="bm-cursed"><span><b>Cursed</b> · lowest total wins</span></label>
+        </div>
+        <div class="fld"><span class="lbl"><span>Cases in this battle</span><span id="bm-count">0 / 50</span></span><div class="bm-cases" id="bm-cases"></div></div>
+        <div class="bm-foot"><button class="btn-ghost" type="button" id="bm-add">Add cases</button><button class="btn-ghost" type="button" id="bm-clear">Clear</button><span class="bm-cost">Cost per player <b class="num" id="bm-cost">0.00</b></span><button class="btn-go" type="button" id="bm-create" disabled>Create battle</button></div>
+      </div>
+      <div class="battle-list" id="battle-list"><p class="empty">Loading battles…</p></div>
+    </section>
+
+    <section class="view" data-view="battle" hidden>
+      <a class="link back" href="#battles">← All battles</a>
+      <div id="battle-view"><p class="empty">Loading battle…</p></div>
+    </section>
+
+    <!-- ROULETTE (live) -->
+    <section class="view" data-view="roulette" hidden>
+      <div class="game-top"><h1 class="page-h">Roulette</h1><span class="pill live"><i class="dot"></i>Live table</span><span class="pill">European · 97.3% RTP</span></div>
+      <div class="game wide">
+        <div class="ctrl">
+          <div class="fld"><span class="lbl">Chip value</span><div class="chips" id="rl-chips"></div></div>
+          <div class="kv"><div><span>Your bets this spin</span><b id="rl-mine">0.00</b></div><div><span>Straight up</span><b>36×</b></div><div><span>Dozen / column</span><b>3×</b></div><div><span>Colors, odd/even, halves</span><b>2×</b></div></div>
+          <div class="row2"><button class="btn-ghost" type="button" id="rl-repeat">Repeat last</button><button class="btn-ghost" type="button" id="rl-double">2×</button><button class="btn-ghost" type="button" id="rl-clear">Clear</button></div>
+        </div>
+        <div class="stage" id="rl-stage">
+          <div class="phase-bar"><span id="rl-phase">Connecting…</span><i id="rl-timer"></i></div>
+          <div class="rl-top">
+            <canvas class="rl-wheel" id="rl-wheel" width="260" height="260"></canvas>
+            <div class="rl-res"><div class="rl-num" id="rl-num">–</div><div class="rl-out" id="rl-out">Tap the table to bet</div><div class="hist center" id="rl-hist"></div></div>
+          </div>
+          <div class="rl-scroll"><div class="rl-board" id="rl-board"></div></div>
+          <div class="players" id="rl-players"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLACKJACK (live) -->
+    <section class="view" data-view="blackjack" hidden>
+      <div class="game-top"><h1 class="page-h">Blackjack</h1><span class="pill live"><i class="dot"></i>Live table · 6 seats</span><span class="pill">Blackjack pays 3:2</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="blackjack"></div>
+          <button class="btn-go" type="button" id="bj-bet">Place bet</button>
+          <div class="bj-acts">
+            <button class="btn-ghost" type="button" data-bj="hit" disabled>Hit</button>
+            <button class="btn-ghost" type="button" data-bj="stand" disabled>Stand</button>
+            <button class="btn-ghost" type="button" data-bj="double" disabled>Double</button>
+            <button class="btn-ghost" type="button" data-bj="split" disabled>Split</button>
+          </div>
+          <button class="btn-ghost" type="button" id="bj-leave" hidden>Leave seat</button>
+          <p class="hint">Take a seat, place a bet, and the hand deals when everyone at the table has bet or the timer runs out. You get 20 seconds per move. Dealer stands on all 17s.</p>
+        </div>
+        <div class="stage" id="bj-stage">
+          <div class="phase-bar"><span id="bj-phase">Connecting…</span><i id="bj-timer"></i></div>
+          <div class="bj-table">
+            <div class="bj-row"><span class="bj-cap">Dealer</span><div class="cards" id="bj-dealer"></div><div class="bj-meta" id="bj-dealer-meta"></div></div>
+            <div class="bj-seats" id="bj-seats"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CRASH (live) -->
+    <section class="view" data-view="crash" hidden>
+      <div class="game-top"><h1 class="page-h">Crash</h1><span class="pill live"><i class="dot"></i>Live rounds</span><span class="pill">99% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="crash"></div>
+          <label class="fld"><span class="lbl"><span>Auto cash out</span><span>0 = off</span></span><div class="amt"><input id="crash-auto" type="number" inputmode="decimal" min="0" step="0.01" value="2.00"><span class="amt-sfx" aria-hidden="true">×</span></div></label>
+          <button class="btn-go" type="button" id="crash-go">Place bet</button>
+          <p class="hint">Everyone rides the same rocket. Bet before launch, then cash out before it crashes to win your bet times the multiplier.</p>
+        </div>
+        <div class="stage" id="crash-stage">
+          <div class="hist" id="crash-hist"></div>
+          <div class="crash-wrap"><canvas id="crash-cv"></canvas><div class="crash-ov"><div class="crash-mult idle" id="crash-mult">Connecting…</div><div class="crash-sub" id="crash-sub"></div></div></div>
+          <div class="players" id="crash-players"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JACKPOT (live) -->
+    <section class="view" data-view="jackpot" hidden>
+      <div class="game-top"><h1 class="page-h">Jackpot</h1><span class="pill live"><i class="dot"></i>Live pot</span><span class="pill">Winner takes 98%</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="jackpot"></div>
+          <button class="btn-go" type="button" id="jp-go">Add to pot</button>
+          <button class="btn-ghost" type="button" id="jp-back" hidden>Take my coins back</button>
+          <p class="hint">Everyone puts coins in one pot. Once two players are in, a 40-second timer starts. One winner takes the pot, and the more you put in, the better your chance.</p>
+        </div>
+        <div class="stage" id="jp-stage">
+          <div class="jp-head"><div><span class="lbl">Pot</span><div class="jp-total num" id="jp-total">0.00</div></div><div class="jp-clock"><span class="lbl">Draw in</span><b class="num" id="jp-time">—</b></div></div>
+          <div class="jp-bar" id="jp-bar"></div>
+          <div class="jp-reel" id="jp-reel"><div class="jp-strip" id="jp-strip"></div><i class="jp-pin"></i></div>
+          <div class="jp-msg" id="jp-msg">Waiting for players</div>
+          <div class="players" id="jp-entries"></div>
+          <div class="hist" id="jp-hist"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COINFLIP (live) -->
+    <section class="view" data-view="coinflip" hidden>
+      <div class="game-top"><h1 class="page-h">Coinflip</h1><span class="pill live"><i class="dot"></i>Player vs player</span><span class="pill">Vs house 1.96×</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="coinflip"></div>
+          <div class="fld"><span class="lbl">Your side</span><div class="side-pick" id="cf-pick"><button type="button" data-side="heads" aria-pressed="true"><span class="mini-coin"></span>Heads</button><button type="button" data-side="tails" aria-pressed="false"><span class="mini-coin t"></span>Tails</button></div></div>
+          <button class="btn-go" type="button" id="cf-create">Create a flip</button>
+          <button class="btn-ghost" type="button" id="cf-house">Flip against the house</button>
+          <p class="hint">Create a flip and wait for someone to take the other side. The winner gets both bets minus 2%, which goes into the rain.</p>
+        </div>
+        <div class="stage top" id="cf-stage">
+          <div class="cf-hero">
+            <div class="cf-stage"><div class="cf-coin" id="cf-coin"><div class="cf-face cf-heads">H</div><div class="cf-face cf-tails">T</div></div></div>
+            <div class="cf-msg" id="cf-msg">Create a flip or join one below</div>
+          </div>
+          <div class="flips" id="cf-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MINES -->
+    <section class="view" data-view="mines" hidden>
+      <div class="game-top"><h1 class="page-h">Mines</h1><span class="pill">99% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="mines"></div>
+          <label class="fld"><span class="lbl">Mines</span><select class="sel" id="mines-count"></select></label>
+          <div class="kv" id="mines-info"></div>
+          <button class="btn-go" type="button" id="mines-go">Bet</button>
+          <button class="btn-ghost" type="button" id="mines-rand" disabled>Pick a random tile</button>
+        </div>
+        <div class="stage" id="mines-stage"><div class="mgrid" id="mines-grid"></div></div>
+      </div>
+    </section>
+
+    <!-- TOWERS -->
+    <section class="view" data-view="towers" hidden>
+      <div class="game-top"><h1 class="page-h">Towers</h1><span class="pill">98% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="towers"></div>
+          <label class="fld"><span class="lbl">Difficulty</span><select class="sel" id="towers-diff"></select></label>
+          <div class="kv" id="towers-info"></div>
+          <button class="btn-go" type="button" id="towers-go">Bet</button>
+        </div>
+        <div class="stage" id="towers-stage"><div class="tower" id="tower"></div></div>
+      </div>
+    </section>
+
+    <!-- PLINKO -->
+    <section class="view" data-view="plinko" hidden>
+      <div class="game-top"><h1 class="page-h">Plinko</h1><span class="pill">99% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="plinko"></div>
+          <div class="fld"><span class="lbl">Risk</span><div class="seg" id="plinko-risk"><button type="button" data-risk="low">Low</button><button type="button" data-risk="medium" aria-pressed="true">Medium</button><button type="button" data-risk="high">High</button></div></div>
+          <label class="fld"><span class="lbl">Rows</span><select class="sel" id="plinko-rows"><option value="8">8 rows</option><option value="12" selected>12 rows</option><option value="16">16 rows</option></select></label>
+          <button class="btn-go" type="button" id="plinko-go">Drop ball</button>
+          <p class="hint">Drop as many balls as you like. Risk and rows lock while balls are falling.</p>
+        </div>
+        <div class="stage" id="plinko-stage"><canvas class="plinko-cv" id="plinko-cv"></canvas><div class="hist center" id="plinko-hist"></div></div>
+      </div>
+    </section>
+
+    <!-- DICE -->
+    <section class="view" data-view="dice" hidden>
+      <div class="game-top"><h1 class="page-h">Dice</h1><span class="pill">99% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="dice"></div>
+          <div class="kv"><div><span>Profit on win</span><b id="dice-profit">0.00</b></div></div>
+          <button class="btn-go" type="button" id="dice-go">Roll</button>
+          <button class="btn-ghost" type="button" id="dice-auto">Start auto roll</button>
+        </div>
+        <div class="stage" id="dice-stage">
+          <div class="dice-wrap">
+            <div class="hist end" id="dice-hist"></div>
+            <div class="dice-big num" id="dice-big">50.00</div>
+            <div>
+              <div class="dice-rail"><div class="dice-marker" id="dice-marker" hidden><span>0.00</span></div><input class="dice-range" id="dice-range" type="range" min="2" max="98" step="1" value="50" aria-label="Target number"></div>
+              <div class="dice-scale" aria-hidden="true"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+            </div>
+            <div class="dice-stats">
+              <div class="dstat"><span class="lbl">Multiplier</span><b id="dice-mult">1.9800×</b></div>
+              <div class="dstat"><span class="lbl" id="dice-dir-lbl">Roll over</span><button type="button" id="dice-dir" aria-label="Switch between roll over and roll under"><span id="dice-target">50.00</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 4v16M7 4L3 8M7 4l4 4M17 20V4M17 20l-4-4M17 20l4-4"/></svg></button></div>
+              <div class="dstat"><span class="lbl">Win chance</span><b id="dice-chance">50.00%</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIMBO -->
+    <section class="view" data-view="limbo" hidden>
+      <div class="game-top"><h1 class="page-h">Limbo</h1><span class="pill">99% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="limbo"></div>
+          <label class="fld"><span class="lbl">Target multiplier</span><div class="amt"><input id="limbo-target" type="number" inputmode="decimal" min="1.01" step="0.01" value="2.00"><span class="amt-sfx" aria-hidden="true">×</span></div></label>
+          <div class="kv"><div><span>Win chance</span><b id="limbo-chance">49.50%</b></div><div><span>Profit on win</span><b id="limbo-profit">0.00</b></div></div>
+          <button class="btn-go" type="button" id="limbo-go">Bet</button>
+        </div>
+        <div class="stage" id="limbo-stage">
+          <div class="hist end" id="limbo-hist"></div>
+          <div class="limbo-big num" id="limbo-big">1.00×</div>
+          <p class="limbo-sub" id="limbo-sub">Win if the result lands on or above your target</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KENO -->
+    <section class="view" data-view="keno" hidden>
+      <div class="game-top"><h1 class="page-h">Keno</h1><span class="pill">99% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="keno"></div>
+          <div class="kv"><div><span>Numbers picked</span><b id="keno-count">0 / 10</b></div></div>
+          <div class="row2 two-col"><button class="btn-ghost" type="button" id="keno-random">Random pick</button><button class="btn-ghost" type="button" id="keno-clear">Clear</button></div>
+          <button class="btn-go" type="button" id="keno-go">Play</button>
+        </div>
+        <div class="stage" id="keno-stage">
+          <div class="keno-grid" id="keno-grid"></div>
+          <div class="keno-pay" id="keno-pay"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HI-LO -->
+    <section class="view" data-view="hilo" hidden>
+      <div class="game-top"><h1 class="page-h">Hi-Lo</h1><span class="pill">99% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="hilo"></div>
+          <div class="kv" id="hilo-info"></div>
+          <button class="btn-go" type="button" id="hilo-go">Bet</button>
+          <div class="hilo-acts">
+            <button class="btn-ghost" type="button" data-hl="hi" disabled>Higher or same</button>
+            <button class="btn-ghost" type="button" data-hl="lo" disabled>Lower or same</button>
+          </div>
+          <button class="btn-ghost" type="button" data-hl="skip" disabled>Skip card</button>
+        </div>
+        <div class="stage" id="hilo-stage">
+          <div class="hilo-card-wrap"><div class="pc big" id="hilo-card"><b>?</b><i></i></div></div>
+          <div class="hilo-mult num" id="hilo-mult">1.00×</div>
+          <div class="hilo-trail" id="hilo-trail"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHEEL -->
+    <section class="view" data-view="wheel" hidden>
+      <div class="game-top"><h1 class="page-h">Wheel</h1><span class="pill">98% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="wheel"></div>
+          <div class="fld"><span class="lbl">Risk</span><div class="seg" id="wheel-risk"><button type="button" data-risk="low">Low</button><button type="button" data-risk="medium" aria-pressed="true">Medium</button><button type="button" data-risk="high">High</button></div></div>
+          <button class="btn-go" type="button" id="wheel-go">Spin</button>
+        </div>
+        <div class="stage" id="wheel-stage">
+          <div class="wheel-wrap"><canvas id="wheel-cv" width="340" height="340"></canvas><div class="wheel-res num" id="wheel-res"></div></div>
+          <div class="wheel-legend" id="wheel-legend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLOTS -->
+    <section class="view" data-view="slots" hidden>
+      <div class="game-top"><h1 class="page-h">Slots</h1><span class="pill">~97% RTP</span></div>
+      <div class="game">
+        <div class="ctrl">
+          <div data-betbox="slots"></div>
+          <button class="btn-go" type="button" id="slots-go">Spin</button>
+          <div class="paytable" id="slots-pay"></div>
+        </div>
+        <div class="stage" id="slots-stage">
+          <div class="slot-machine"><div class="reels" id="reels"></div><i class="payline"></i></div>
+          <div class="slot-msg" id="slot-msg">Line up three of a kind on the middle row</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="rail" aria-label="Rain and live wins">
+    <div class="card rain-card" data-rain></div>
+    <div class="card">
+      <div class="card-head"><h3 class="card-h">Live wins</h3><span class="pill">2× and up</span></div>
+      <ol class="rowlist" data-feed></ol>
+    </div>
+  </aside>
+</div>
+
+<footer class="foot"><p>Coinfall is a free-to-play game for fun. Coins have no cash value and can't be bought, sold, traded for money, or withdrawn.</p></footer>
+
+<div class="modal" id="auth-modal" hidden>
+  <form class="modal-card" id="auth-form" novalidate>
+    <span class="coin xl"></span>
+    <div class="seg" id="auth-tabs"><button type="button" data-mode="signup" aria-pressed="true">Sign up</button><button type="button" data-mode="login" aria-pressed="false">Log in</button></div>
+    <h2 id="auth-title">Make a free account</h2>
+    <p id="auth-sub">You start with 100 free coins. Pick a name other players will see.</p>
+    <label class="fld"><span class="lbl">Player name</span><input class="txt" id="auth-name" maxlength="16" autocomplete="username" spellcheck="false"></label>
+    <label class="fld"><span class="lbl">Password</span><input class="txt" id="auth-pass" type="password" maxlength="64" autocomplete="new-password"></label>
+    <p class="err" id="auth-err" hidden></p>
+    <div class="modal-row"><button type="button" class="btn-ghost" id="auth-cancel">Not now</button><button type="submit" class="btn-go sm" id="auth-go">Start playing</button></div>
+    <p class="fine">No email needed. Write your password down: there is no way to reset it.</p>
+  </form>
+</div>
+<div class="modal" id="picker" hidden>
+  <div class="modal-card wide">
+    <div class="card-head"><h2>Add cases</h2><span class="hint" id="picker-sum"></span><button class="btn-go sm" type="button" id="picker-done">Done</button></div>
+    <div class="picker-tools"><input class="txt" id="picker-q" placeholder="Search 120 cases" autocomplete="off" aria-label="Search cases"><select class="sel" id="picker-sort" aria-label="Sort cases"><option value="asc">Cheapest first</option><option value="desc">Priciest first</option><option value="name">A to Z</option></select></div>
+    <div class="picker-grid" id="picker-grid"></div>
+  </div>
+</div>
+<aside class="chat" id="chat" hidden aria-label="Chat">
+  <div class="chat-head"><h3 class="card-h">Chat</h3><span class="pill"><i class="dot"></i><span data-online>0</span> online</span><button class="icon-btn sm" type="button" id="chat-close" aria-label="Close chat">×</button></div>
+  <ol class="chat-list" id="chat-list"><li class="chat-empty">No messages yet. Say hi!</li></ol>
+  <div class="chat-tip" id="chat-tip" hidden>
+    <span class="lbl">Tip a player</span>
+    <div class="chat-tip-row"><input class="txt" id="tip-to" placeholder="Player name" autocomplete="off" aria-label="Player to tip"><div class="amt"><span class="coin sm"></span><input id="tip-amt" type="number" inputmode="decimal" min="1" step="1" placeholder="Coins" aria-label="Coins to tip"></div><button class="btn-go sm" type="button" id="tip-send">Tip</button></div>
+  </div>
+  <form class="chat-form" id="chat-form"><button type="button" class="icon-btn sm" id="tip-toggle" title="Tip a player" aria-label="Tip a player"><span class="coin sm"></span></button><input class="txt" id="chat-input" maxlength="200" placeholder="Say something nice" autocomplete="off" aria-label="Chat message"><button class="btn-go sm" type="submit">Send</button></form>
+  <p class="chat-rules">Be kind. Links are removed. Never share personal info like your real name, address or school. Tap a name to tip or hide them.</p>
+</aside>
+<div class="name-menu" id="name-menu" hidden></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<canvas class="shower" id="shower" aria-hidden="true"></canvas>
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+// Cloudflare settings for Coinfall. The "name" must match the Worker name you pick in the dashboard.
+{
+  "name": "coinfall",
+  "main": "src/index.js",
+  "compatibility_date": "2025-06-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "CASINO", "class_name": "Casino" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Casino"] }],
+  "observability": { "enabled": true }
+}
